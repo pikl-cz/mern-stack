@@ -1,3 +1,4 @@
 {
-  "mongoURI": "mongodb+srv://honza123:honza123@devconnector-ifnax.mongodb.net/test?retryWrites=true"
+  "mongoURI": "mongodb+srv://honza123:honza123@devconnector-ifnax.mongodb.net/test?retryWrites=true",
+  "jwtSecret": "mysecrettoken"
 }
