@@ -1,11 +1,12 @@
 import React, { Fragment, useState } from 'react'
 import axios from 'axios'; //kvuli requestu
 import { connect } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { Link, Redirect } from 'react-router-dom';
 import { setAlert } from '../../actions/alert';
+import { register } from '../../actions/auth';
 import PropTypes from 'prop-types';
 
-const Register = (props, { setAlert }) => {
+const Register = ({ setAlert, register, isAuthenticated }) => {
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -15,17 +16,19 @@ const Register = (props, { setAlert }) => {
 
     const { name, email, password, password2 } = formData;
 
-    const onChange = e => setFormData({ ...formData, [e.target.name]: e.target.value });
+    const onChange = e =>
+        setFormData({ ...formData, [e.target.name]: e.target.value });
 
     const onSubmit = async e => {
         e.preventDefault();
         if (password !== password2) {
             //console.log('Passwords do not match!');
-            props.setAlert('Passwords do not match!', 'danger', 3000);
+            setAlert('Passwords do not match!', 'danger', 3000);
         } else {
+            register({ name, email, password });
             //console.log(formData);
             console.log('Success');
-            const newUser = {
+            /*const newUser = {
                 name,
                 email,
                 password
@@ -44,8 +47,13 @@ const Register = (props, { setAlert }) => {
                 console.log(res.data);
             } catch (err) {
                 console.error(err.response.data);
-            }
+            }*/
         }
+    }
+
+    // Redirect if logged in
+    if (isAuthenticated) {
+        return <Redirect to="/dashboard" />
     }
 
     return (
@@ -60,7 +68,7 @@ const Register = (props, { setAlert }) => {
                         name="name"
                         value={name}
                         onChange={e => onChange(e)}
-                        required
+                    // required
                     />
                 </div>
                 <div className="form-group">
@@ -82,7 +90,7 @@ const Register = (props, { setAlert }) => {
                         name="password"
                         value={password}
                         onChange={e => onChange(e)}
-                        minLength="6"
+                    // minLength="6"
                     />
                 </div>
                 <div className="form-group">
@@ -92,7 +100,7 @@ const Register = (props, { setAlert }) => {
                         name="password2"
                         value={password2}
                         onChange={e => onChange(e)}
-                        minLength="6"
+                    //  minLength="6"
                     />
                 </div>
                 <input type="submit" className="btn btn-primary" value="Register" />
@@ -105,10 +113,16 @@ const Register = (props, { setAlert }) => {
 }
 
 Register.propTypes = {
-    setAlert: PropTypes.func.isRequired
+    setAlert: PropTypes.func.isRequired,
+    register: PropTypes.func.isRequired,
+    isAuthenticated: PropTypes.bool
 };
 
+const mapStateToProps = state => ({
+    isAuthenticated: state.auth.isAuthenticated
+});
+
 export default connect(
-    null,
-    { setAlert }
+    mapStateToProps,
+    { setAlert, register }
 )(Register);
